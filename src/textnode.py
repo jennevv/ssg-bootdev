@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class TextType(Enum):
-    PLAIN = "plain"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -14,7 +14,7 @@ class TextType(Enum):
 class TextNode:
     def __init__(self, text: str, text_type: TextType, url: Optional[str] = None):
         self.text = text
-        self.text_type = text_type.value
+        self.text_type = text_type
         self.url = url
 
     def __eq__(self, other):
@@ -27,4 +27,4 @@ class TextNode:
         return False
 
     def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type}, {self.url})"
+        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
