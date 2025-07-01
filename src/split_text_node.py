@@ -1,6 +1,5 @@
-from typing import Callable
-from .textnode import TextNode, TextType
 from .link_extraction import extract_markdown_images, extract_markdown_links
+from .textnode import TextNode, TextType
 
 
 def check_delimiter_text_type_match(delimiter: str, text_type: TextType) -> None:
