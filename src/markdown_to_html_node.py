@@ -1,6 +1,6 @@
 from .block_type import md_block_to_block_type, BlockType
 from .markdown_to_blocks import markdown_to_blocks
-from .htmlnode import LeafNode, ParentNode, HTMLNode
+from .html_node import LeafNode, ParentNode, HTMLNode
 
 
 def markdown_to_html_node(md: str) -> HTMLNode:

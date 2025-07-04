@@ -1,5 +1,6 @@
+from typing import Callable
 from .link_extraction import extract_markdown_images, extract_markdown_links
-from .textnode import TextNode, TextType
+from .text_node import TextNode, TextType
 
 
 def check_delimiter_text_type_match(delimiter: str, text_type: TextType) -> None:
@@ -68,66 +69,51 @@ def split_nodes_delimiter(
     return nodes
 
 
-def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+def splitter(
+    old_nodes: list[TextNode],
+    str_format: str,
+    extract_func: Callable[[str], list[tuple[str, str]]],
+    text_type: TextType,
+) -> list[TextNode]:
     nodes: list[TextNode] = []
 
     for node in old_nodes:
-        text = node.text
-        images: list[tuple[str, str]] = extract_markdown_images(text)
+        if node.text_type != TextType.TEXT:
+            nodes.extend([node])
+            continue
 
-        if images == []:
+        text = node.text
+        items = extract_func(text)
+
+        if items == []:
             nodes.append(node)
         else:
-            for i, image in enumerate(images):
+            for i, item in enumerate(items):
                 if i == 0:
-                    split = text.split(f"![{image[0]}]({image[1]})", maxsplit=1)
-                    nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
-                    nodes.append(
-                        TextNode(text=image[0], text_type=TextType.IMAGE, url=image[1])
-                    )
+                    split = text.split(str_format.format(item[0], item[1]), maxsplit=1)
                 else:
-                    prev_split: list[str] = split
-                    split = prev_split[1].split(
-                        f"![{image[0]}]({image[1]})", maxsplit=1
-                    )
-                    nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
-                    nodes.append(
-                        TextNode(text=image[0], text_type=TextType.IMAGE, url=image[1])
+                    split = split[1].split(
+                        str_format.format(item[0], item[1]), maxsplit=1
                     )
 
-                if i + 1 == len(images) and split[1] != "":
+                if split[0] != "":
+                    nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
+
+                nodes.append(TextNode(text=item[0], text_type=text_type, url=item[1]))
+
+                if i + 1 == len(items) and split[1] != "":
                     nodes.append(TextNode(text=split[1], text_type=TextType.TEXT))
 
     return nodes
 
 
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    str_format = "![{}]({})"
+    nodes = splitter(old_nodes, str_format, extract_markdown_images, TextType.IMAGE)
+    return nodes
+
+
 def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
-    nodes: list[TextNode] = []
-
-    for node in old_nodes:
-        text = node.text
-        links: list[tuple[str, str]] = extract_markdown_links(text)
-
-        if links == []:
-            nodes.append(node)
-
-        else:
-            for i, link in enumerate(links):
-                if i == 0:
-                    split = text.split(f"[{link[0]}]({link[1]})", maxsplit=1)
-                    nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
-                    nodes.append(
-                        TextNode(text=link[0], text_type=TextType.LINK, url=link[1])
-                    )
-                else:
-                    prev_split: list[str] = split
-                    split = prev_split[1].split(f"[{link[0]}]({link[1]})", maxsplit=1)
-                    nodes.append(TextNode(text=split[0], text_type=TextType.TEXT))
-                    nodes.append(
-                        TextNode(text=link[0], text_type=TextType.LINK, url=link[1])
-                    )
-
-                if i + 1 == len(links) and split[1] != "":
-                    nodes.append(TextNode(text=split[1], text_type=TextType.TEXT))
-
+    str_format = "[{}]({})"
+    nodes = splitter(old_nodes, str_format, extract_markdown_links, TextType.LINK)
     return nodes
