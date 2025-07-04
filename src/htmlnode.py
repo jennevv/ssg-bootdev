@@ -1,41 +1,43 @@
-from typing import Optional
+from typing import override
 
 
 class HTMLNode:
     def __init__(
         self,
-        tag: Optional[str] = None,
-        value: Optional[str] = None,
-        children: Optional[list["HTMLNode"]] = None,
-        props: Optional[dict[str, str]] = None,
+        tag: str | None = None,
+        value: str | None = None,
+        children: list["HTMLNode"] | None = None,
+        props: dict[str, str | None] | None = None,
     ):
-        self.tag = tag
-        self.value = value
-        self.children = children
-        self.props = props
+        self.tag: str | None = tag
+        self.value: str | None = value
+        self.children: list["HTMLNode"] | None = children
+        self.props: dict[str, str | None] | None = props
 
-    def to_html(self):
+    def to_html(self) -> str | None:
         raise NotImplementedError()
 
-    def props_to_html(self):
+    def props_to_html(self) -> str:
         if self.props:
             return "".join([f' {key}="{value}"' for key, value in self.props.items()])
         return ""
 
-    def __repr__(self):
+    @override
+    def __repr__(self) -> str:
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
 
 
 class LeafNode(HTMLNode):
     def __init__(
         self,
-        tag: str,
-        value: str,
-        props: Optional[dict[str, str]] = None,
+        tag: str | None,
+        value: str | None,
+        props: dict[str, str | None] | None = None,
     ):
         super().__init__(tag, value, None, props)
 
-    def to_html(self):
+    @override
+    def to_html(self) -> str:
         if self.tag == "img":
             return f"<{self.tag}{self.props_to_html()}>"
         elif self.value is None:
@@ -50,12 +52,13 @@ class ParentNode(HTMLNode):
     def __init__(
         self,
         tag: str,
-        children: HTMLNode,
-        props: Optional[dict[str, str]] = None,
+        children: list[HTMLNode],
+        props: dict[str, str | None] | None = None,
     ):
         super().__init__(tag, None, children, props)
 
-    def to_html(self):
+    @override
+    def to_html(self) -> str:
         if self.tag is None:
             raise ValueError("A ParentNode must have a tag.")
         if self.children is None:

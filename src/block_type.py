@@ -19,7 +19,7 @@ def md_block_to_block_type(md_block: str) -> BlockType:
     elif contains_quote(md_block):
         return BlockType("quote")
     elif contains_unordered_list(md_block):
-        return BlockType("UNORDERED_LIST")
+        return BlockType("unordered_list")
     elif contains_ordered_list(md_block):
         return BlockType("ordered_list")
     else:
@@ -31,28 +31,22 @@ def contains_heading(md_block: str) -> bool:
 
 
 def contains_code(md_block: str) -> bool:
-    return bool(re.match("^(```)|(```)$", md_block))
+    return bool(re.match("(?s)(^`{3}).*(`{3}$)", md_block))
 
 
 def contains_quote(md_block: str) -> bool:
     split_over_lines = md_block.split("\n")
-    starts_with_char = list(
-        filter(lambda x: bool(re.match(r"(^|(?<=\n))>", x)), md_block)
-    )
-    return len(starts_with_char) == len(split_over_lines)
+    num_correct_lines = sum([bool(re.match(r"(^>)", x)) for x in split_over_lines])
+    return num_correct_lines == len(split_over_lines)
 
 
 def contains_unordered_list(md_block: str) -> bool:
     split_over_lines = md_block.split("\n")
-    starts_with_char = list(
-        filter(lambda x: bool(re.match(r"(^|(?<=\n))- ", x)), md_block)
-    )
-    return len(starts_with_char) == len(split_over_lines)
+    num_correct_lines = sum([bool(re.match(r"(^- )", x)) for x in split_over_lines])
+    return num_correct_lines == len(split_over_lines)
 
 
 def contains_ordered_list(md_block: str) -> bool:
     split_over_lines = md_block.split("\n")
-    starts_with_char = list(
-        filter(lambda x: bool(re.match(r"(^|(?<=\n))\d\. ", x)), md_block)
-    )
-    return len(starts_with_char) == len(split_over_lines)
+    num_correct_lines = sum([bool(re.match(r"(^\d\. )", x)) for x in split_over_lines])
+    return num_correct_lines == len(split_over_lines)
