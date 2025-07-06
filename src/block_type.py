@@ -30,6 +30,15 @@ def contains_heading(md_block: str) -> bool:
     return bool(re.match("^(#{1,6}) .*", md_block))
 
 
+def heading_level(md_block: str) -> int:
+    match = re.match("^(#{1,6}) .*", md_block)
+    if match:
+        length = len(match.group(0))
+        return length
+    else:
+        return 0
+
+
 def contains_code(md_block: str) -> bool:
     return bool(re.match("(?s)(^`{3}).*(`{3}$)", md_block))
 
