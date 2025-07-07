@@ -36,9 +36,33 @@ class TestMarkdownToHTMLNode(unittest.TestCase):
         )
 
     def test_quote(self):
-        md = """
-        > This is a quote
-        > spread over multiple lines
-        >
-        > I guess
-        """
+        md = ">This is a **quote**\n>spread over multiple _lines_\n>\n>I guess"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a <b>quote</b> spread over multiple <i>lines</i>  I guess</blockquote></div>",
+        )
+
+    def test_unordered_list(self):
+        md = "\n- item 1\n- item 2\n- item3"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html, "<div><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul></div>"
+        )
+
+    def test_ordered_list(self):
+        md = "\n1. item 1\n2. item 2\n3. item3"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html, "<div><ol><li>item 1</li><li>item 2</li><li>item 3</li></ol></div>"
+        )
+
+    def test_heading(self):
+        md = "# Heading"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><h1>Heading</h1></div>")

@@ -8,7 +8,7 @@ from .text_node_to_html_node import text_node_to_html_node
 
 def markdown_to_html_node(md: str) -> HTMLNode:
     md_blocks = markdown_to_blocks(md)
-    html_nodes = []
+    html_nodes: list[ParentNode] = []
     for block in md_blocks:
         block_type = md_block_to_block_type(block)
         children = text_to_children(block, block_type)
@@ -60,11 +60,25 @@ def text_to_children(text: str, block_type: BlockType) -> list[LeafNode | Parent
                 for item_text_node in list_item_text_nodes
             ]
             return list_item_html_nodes
-        case _:
+        case BlockType.QUOTE:
+            formatted_text = format_quote_text(text)
+            quote_text_nodes = text_to_text_nodes(formatted_text)
+            quote_html_nodes = list(map(text_node_to_html_node, quote_text_nodes))
+            return quote_html_nodes
+
+        case BlockType.HEADING:
+            formatted_text = format_heading_text(text)
+            heading_text_nodes = text_to_text_nodes(formatted_text)
+            heading_html_nodes = list(map(text_node_to_html_node, heading_html_nodes))
+            return heading_html_nodes
+
+        case BlockType.PARAGRAPH:
             formatted_text = format_text(text)
-            text_nodes = text_to_text_nodes(formatted_text)
-            html_nodes = list(map(text_node_to_html_node, text_nodes))
-            return html_nodes
+            paragraph_text_nodes = text_to_text_nodes(formatted_text)
+            paragraph_html_nodes = list(
+                map(text_node_to_html_node, paragraph_text_nodes)
+            )
+            return paragraph_html_nodes
 
 
 def format_text(text: str) -> str:
@@ -87,3 +101,13 @@ def format_list_text(text: str) -> str:
     list_of_lines = [line.strip() for line in list_of_lines]
     formatted_text = "\n".join(list_of_lines)
     return formatted_text
+
+
+def format_quote_text(text: str) -> str:
+    list_of_lines = text.replace(">", "").splitlines()
+    formatted_text = " ".join(list_of_lines)
+    return formatted_text
+
+
+def format_heading_text(text: str) -> str:
+    return text.replace("#", "")[1:]
