@@ -33,7 +33,7 @@ def contains_heading(md_block: str) -> bool:
 def heading_level(md_block: str) -> int:
     match = re.match("^(#{1,6}) .*", md_block)
     if match:
-        length = len(match.group(0))
+        length = len(match.group(1))
         return length
     else:
         return 0

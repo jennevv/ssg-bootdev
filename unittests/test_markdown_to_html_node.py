@@ -6,11 +6,11 @@ from src.markdown_to_html_node import markdown_to_html_node
 class TestMarkdownToHTMLNode(unittest.TestCase):
     def test_paragraphs(self):
         md = """
-        This is **bolded** paragraph
-        text in a p
-        tag here
+This is **bolded** paragraph
+text in a p
+tag here
 
-        This is another paragraph with _italic_ text and `code` here
+This is another paragraph with _italic_ text and `code` here
     """
 
         node = markdown_to_html_node(md)
@@ -23,8 +23,8 @@ class TestMarkdownToHTMLNode(unittest.TestCase):
     def test_codeblock(self):
         md = """
     ```
-    This is text that _should_ remain
-    the **same** even with inline stuff
+This is text that _should_ remain
+the **same** even with inline stuff
     ```
     """
 
@@ -46,15 +46,16 @@ class TestMarkdownToHTMLNode(unittest.TestCase):
         )
 
     def test_unordered_list(self):
-        md = "\n- item 1\n- item 2\n- item3"
+        md = "\n- **item** 1\n- item 2\n- item 3"
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
-            html, "<div><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul></div>"
+            html,
+            "<div><ul><li><b>item</b> 1</li><li>item 2</li><li>item 3</li></ul></div>",
         )
 
     def test_ordered_list(self):
-        md = "\n1. item 1\n2. item 2\n3. item3"
+        md = "\n1. item 1\n2. item 2\n3. item 3"
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
