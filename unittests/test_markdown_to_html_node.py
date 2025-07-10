@@ -36,13 +36,23 @@ the **same** even with inline stuff
         )
 
     def test_quote(self):
+        md = ">This is a **quote**\n>spread over multiple _lines_>\n>I guess"
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote><p>This is a <b>quote</b> spread over multiple <i>lines</i> I guess</p></blockquote></div>",
+        )
+
+    def test_quote_multiple_paragraphs(self):
         md = ">This is a **quote**\n>spread over multiple _lines_\n>\n>I guess"
 
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><blockquote>This is a <b>quote</b> spread over multiple <i>lines</i>  I guess</blockquote></div>",
+            "<div><blockquote><p>This is a <b>quote</b> spread over multiple <i>lines</i></p><p>I guess</p></blockquote></div>",
         )
 
     def test_unordered_list(self):
