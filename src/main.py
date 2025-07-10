@@ -1,9 +1,11 @@
-from textnode import TextNode, TextType
+from cp_dir import cp_dir
 
 
 def main():
-    node = TextNode("This is some text", "plain")
-    print(node)
+    src = "static/"
+    dst = "public/"
+
+    cp_dir(src, dst)
 
 
 if __name__ == "__main__":
