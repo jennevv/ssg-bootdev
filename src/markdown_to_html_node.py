@@ -1,6 +1,6 @@
 import re
 
-from src.text_node import TextNode, TextType
+from .text_node import TextNode, TextType
 from .block_type import md_block_to_block_type, BlockType, heading_level
 from .markdown_to_blocks import markdown_to_blocks
 from .html_node import LeafNode, ParentNode, HTMLNode
@@ -113,8 +113,9 @@ def format_ordered_list_text(text: str) -> str:
 
 
 def format_quote_text(text: str) -> str:
-    list_of_lines = text.replace(">", "").splitlines()
-    formatted_text = " ".join(list_of_lines)
+    formatted_text = " ".join(
+        [line.strip() for line in text.replace(">", "").splitlines()]
+    )
     return formatted_text
 
 
