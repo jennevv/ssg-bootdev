@@ -66,9 +66,22 @@ def text_to_children(text: str, block_type: BlockType) -> list[LeafNode | Parent
             return parent_list_html_nodes
         case BlockType.QUOTE:
             formatted_text = format_quote_text(text)
-            quote_text_nodes = text_to_text_nodes(formatted_text)
-            quote_html_nodes = list(map(text_node_to_html_node, quote_text_nodes))
-            return quote_html_nodes
+            paragraphs: list[str] = []
+            last_idx = 0
+            for idx, line in enumerate(formatted_text.splitlines()):
+                if line == "":
+                    paragraphs.append(
+                        " ".join(formatted_text.splitlines()[last_idx:idx])
+                    )
+                    last_idx = idx + 1
+            paragraphs.append(" ".join(formatted_text.splitlines()[last_idx:]))
+
+            parent_html_nodes: list[ParentNode] = []
+            for paragraph in paragraphs:
+                children = text_to_text_nodes(paragraph)
+                children = list(map(text_node_to_html_node, children))
+                parent_html_nodes.append(ParentNode("p", children))
+            return parent_html_nodes
 
         case BlockType.HEADING:
             formatted_text = format_heading_text(text)
@@ -113,7 +126,7 @@ def format_ordered_list_text(text: str) -> str:
 
 
 def format_quote_text(text: str) -> str:
-    formatted_text = " ".join(
+    formatted_text = "\n".join(
         [line.strip() for line in text.replace(">", "").splitlines()]
     )
     return formatted_text
